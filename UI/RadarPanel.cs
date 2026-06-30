@@ -1,41 +1,42 @@
 using Godot;
-using VectorATC.Core;
+using System.Collections.Generic;
 
 public partial class RadarPanel : Control
 {
-    private Aircraft _testAircraft;
+    private List<Aircraft> _aircraft = new List<Aircraft>();
+    private TrafficSpawner _spawner;
 
     public override void _Ready()
     {
-        ClipContents = true;
-        
         SizeFlagsVertical = SizeFlags.ExpandFill;
         CustomMinimumSize = new Vector2(0, 300);
+        ClipContents = true;
 
-        var b738 = AircraftTypeDatabase.Common[0];
-        _testAircraft = new Aircraft("SQP123", b738, 100, 100, 0, 80, 5000);
-
-        var plan = new FlightPlan("EPWA", "EPGD");
-        plan.Route.Add(new Waypoint("WPT1", 600, 80));
-        plan.Route.Add(new Waypoint("WPT2", 1000, 220));
-        plan.Route.Add(new Waypoint("WPT3", 1400, 80));
-        _testAircraft.FlightPlan = plan;
+        _spawner = new TrafficSpawner(Size.X, Size.Y);
     }
 
     public override void _Process(double delta)
     {
-        _testAircraft.Move((float)delta);
-        QueueRedraw(); // says to Godot to "redraw"
+        _spawner.Update((float)delta, _aircraft);
+
+        foreach (var plane in _aircraft)
+            plane.Move((float)delta);
+
+        GD.Print($"Aircraft count: {_aircraft.Count}");
+
+        QueueRedraw();
     }
 
     public override void _Draw()
     {
         DrawRect(new Rect2(Vector2.Zero, Size), new Color("#0a0a0a"));
-        
-        var position = new Vector2(_testAircraft.X, _testAircraft.Y);
-        DrawCircle(position, 5f, Colors.LimeGreen);
-        
-        DrawString(ThemeDB.FallbackFont, position + new Vector2(8, -8), 
-            _testAircraft.Callsign, HorizontalAlignment.Left, -1, 14, Colors.LimeGreen);
+
+        foreach (var plane in _aircraft)
+        {
+            var position = new Vector2(plane.X, plane.Y);
+            DrawCircle(position, 5f, Colors.LimeGreen);
+            DrawString(ThemeDB.FallbackFont, position + new Vector2(8, -8),
+                plane.Callsign, HorizontalAlignment.Left, -1, 14, Colors.LimeGreen);
+        }
     }
 }
