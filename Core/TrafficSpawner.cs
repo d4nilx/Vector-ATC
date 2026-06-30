@@ -11,7 +11,11 @@ public class TrafficSpawner
     private Random _random = new Random();
     private int _callsignCounter = 100;
 
-    public TrafficSpawner(float width, float height)
+    public TrafficSpawner()
+    {
+    }
+
+    public void UpdateBounds(float width, float height)
     {
         _width = width;
         _height = height;
@@ -19,6 +23,8 @@ public class TrafficSpawner
 
     public void Update(float deltaTime, List<Aircraft> aircraftList)
     {
+        if (_width == 0 || _height == 0) return;
+
         _timeSinceLastSpawn += deltaTime;
         if (_timeSinceLastSpawn >= _spawnInterval)
         {

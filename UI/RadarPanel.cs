@@ -1,10 +1,15 @@
 using Godot;
+using System;
 using System.Collections.Generic;
+using VectorATC.Core;
 
 public partial class RadarPanel : Control
 {
     private List<Aircraft> _aircraft = new List<Aircraft>();
     private TrafficSpawner _spawner;
+    private int _previousAircraftCount = 0;
+
+    public event Action<List<Aircraft>> OnTrafficUpdated;
 
     public override void _Ready()
     {
@@ -12,17 +17,23 @@ public partial class RadarPanel : Control
         CustomMinimumSize = new Vector2(0, 300);
         ClipContents = true;
 
-        _spawner = new TrafficSpawner(Size.X, Size.Y);
+        _spawner = new TrafficSpawner(); 
     }
 
     public override void _Process(double delta)
     {
+        _spawner.UpdateBounds(Size.X, Size.Y);
+        
         _spawner.Update((float)delta, _aircraft);
+
+        if (_aircraft.Count != _previousAircraftCount)
+        {
+            _previousAircraftCount = _aircraft.Count;
+            OnTrafficUpdated?.Invoke(_aircraft);
+        }
 
         foreach (var plane in _aircraft)
             plane.Move((float)delta);
-
-        GD.Print($"Aircraft count: {_aircraft.Count}");
 
         QueueRedraw();
     }

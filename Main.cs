@@ -1,24 +1,34 @@
 using Godot;
 using VectorATC.Core;
 
-public partial class Main : Control
+namespace VectorATC.UI 
 {
-    public override void _Ready()
+    public partial class Main : Control
     {
-        SetAnchorsPreset(LayoutPreset.FullRect);
+        public override void _Ready()
+        {
+            SetAnchorsPreset(LayoutPreset.FullRect);
 
-        var mainLayout = new HBoxContainer();
-        mainLayout.SetAnchorsPreset(LayoutPreset.FullRect);
-        AddChild(mainLayout);
+            var mainLayout = new HBoxContainer();
+            mainLayout.SetAnchorsPreset(LayoutPreset.FullRect);
+            AddChild(mainLayout);
 
-        var leftPanel = new VBoxContainer();
-        leftPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        mainLayout.AddChild(leftPanel);
+            var leftPanel = new VBoxContainer();
+            leftPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            mainLayout.AddChild(leftPanel);
 
-        leftPanel.AddChild(new WeatherPanel());
-        leftPanel.AddChild(new RadarPanel());
-        leftPanel.AddChild(new ControlPanel());
+            var weatherPanel = new WeatherPanel();
+            var radarPanel = new RadarPanel();
+            var controlPanel = new ControlPanel();
+            var sidePanel = new SidePanel();
 
-        mainLayout.AddChild(new SidePanel());
+            radarPanel.OnTrafficUpdated += sidePanel.UpdateList;
+
+            leftPanel.AddChild(weatherPanel);
+            leftPanel.AddChild(radarPanel);
+            leftPanel.AddChild(controlPanel);
+
+            mainLayout.AddChild(sidePanel);
+        }
     }
 }
