@@ -7,11 +7,19 @@ public partial class RadarPanel : Control
 
     public override void _Ready()
     {
+        ClipContents = true;
+        
         SizeFlagsVertical = SizeFlags.ExpandFill;
-        CustomMinimumSize = new Vector2(0, 300); 
+        CustomMinimumSize = new Vector2(0, 300);
 
         var b738 = AircraftTypeDatabase.Common[0];
-        _testAircraft = new Aircraft("SQP123", b738, 100, 100, 90, 50, 5000);
+        _testAircraft = new Aircraft("SQP123", b738, 100, 100, 0, 80, 5000);
+
+        var plan = new FlightPlan("EPWA", "EPGD");
+        plan.Route.Add(new Waypoint("WPT1", 600, 80));
+        plan.Route.Add(new Waypoint("WPT2", 1000, 220));
+        plan.Route.Add(new Waypoint("WPT3", 1400, 80));
+        _testAircraft.FlightPlan = plan;
     }
 
     public override void _Process(double delta)
