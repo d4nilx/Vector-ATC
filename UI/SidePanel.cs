@@ -1,43 +1,48 @@
 using Godot;
+using System; 
 using System.Collections.Generic;
 using VectorATC.Core;
 
-public partial class SidePanel : ColorRect
+namespace VectorATC.UI 
 {
-    private ItemList _trafficList;
-    private List<Aircraft> _currentAircraft = new List<Aircraft>();
-
-    public override void _Ready()
+    public partial class SidePanel : ColorRect
     {
-        Color = new Color("#222222");
-        CustomMinimumSize = new Vector2(250, 0);
+        private ItemList _trafficList;
+        private List<Aircraft> _currentAircraft = new List<Aircraft>();
 
-        _trafficList = new ItemList();
-        _trafficList.SetAnchorsPreset(LayoutPreset.FullRect);
-        
-        _trafficList.AddThemeColorOverride("font_color", Colors.LightGreen);
-        
-        AddChild(_trafficList);
+        public event Action<string> OnAircraftSelectedEvent;
 
-        _trafficList.ItemSelected += OnAircraftSelected;
-    }
-
-    public void UpdateList(List<Aircraft> aircrafts)
-    {
-        _currentAircraft = aircrafts;
-        _trafficList.Clear();
-
-        foreach (var plane in aircrafts)
+        public override void _Ready()
         {
-            string info = $"✈️ {plane.Callsign} | FL{plane.Altitude / 100} | {plane.Speed}kt";
-            _trafficList.AddItem(info);
-        }
-    }
+            Color = new Color("#222222");
+            CustomMinimumSize = new Vector2(250, 0);
 
-    private void OnAircraftSelected(long index)
-    {
-        var selectedPlane = _currentAircraft[(int)index];
-        
-        GD.Print($"DISPATCHER SELECTED: {selectedPlane.Callsign}");
+            _trafficList = new ItemList();
+            _trafficList.SetAnchorsPreset(LayoutPreset.FullRect);
+            _trafficList.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _trafficList.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _trafficList.AddThemeColorOverride("font_color", Colors.LightGreen);
+            AddChild(_trafficList);
+
+            _trafficList.ItemSelected += OnAircraftSelected;
+        }
+
+        public void UpdateList(List<Aircraft> aircrafts)
+        {
+            _currentAircraft = aircrafts;
+            _trafficList.Clear();
+
+            foreach (var plane in aircrafts)
+            {
+                string info = $"✈️ {plane.Callsign} | FL{plane.Altitude / 100} | {plane.Speed}kt";
+                _trafficList.AddItem(info);
+            }
+        }
+
+        private void OnAircraftSelected(long index)
+        {
+            var selectedPlane = _currentAircraft[(int)index];
+            OnAircraftSelectedEvent?.Invoke(selectedPlane.Callsign);
+        }
     }
 }

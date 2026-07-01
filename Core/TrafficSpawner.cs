@@ -38,35 +38,31 @@ public class TrafficSpawner
         var types = AircraftTypeDatabase.Common;
         var type = types[_random.Next(types.Count)];
 
-        // Choose a random edge of the screen for the aircraft to spawn from
         int edge = _random.Next(4);
-        float startX = 0, startY = 0, heading = 0;
-
-        // Random for plane course variance to make it more natural
-        int variance = _random.Next(-30, 30);
+        float startX, startY, heading;
+        const float margin = 5f; 
 
         switch (edge)
         {
-            case 0: // From the top goin down
+            case 0: 
                 startX = (float)(_random.NextDouble() * _width);
-                startY = -50; 
-                heading = 180 + variance;
+                startY = margin;
+                heading = 180;
                 break;
-            case 1: // From the bottom going up
+            case 1: 
                 startX = (float)(_random.NextDouble() * _width);
-                startY = _height + 50;
-                heading = 0 + variance;
-                if (heading < 0) heading += 360; 
+                startY = _height - margin;
+                heading = 0;
                 break;
-            case 2: // From the left, flying right
-                startX = -50;
+            case 2: 
+                startX = margin;
                 startY = (float)(_random.NextDouble() * _height);
-                heading = 90 + variance;
+                heading = 90;
                 break;
-            default: // From the right, flying left
-                startX = _width + 50;
+            default: 
+                startX = _width - margin;
                 startY = (float)(_random.NextDouble() * _height);
-                heading = 270 + variance;
+                heading = 270;
                 break;
         }
 
@@ -76,12 +72,13 @@ public class TrafficSpawner
             x: startX,
             y: startY,
             heading: heading,
-            speed: 60, 
+            speed: 20,
             altitude: 5000 + _random.Next(0, 30) * 100
         );
 
-        // Set a simple flight plan to exit the screen on the opposite side
+        var (exitX, exitY) = GetOppositePoint(edge);
         var plan = new FlightPlan("ENTRY", "EXIT");
+        plan.Route.Add(new Waypoint("EXIT", exitX, exitY));
         aircraft.FlightPlan = plan;
 
         return aircraft;

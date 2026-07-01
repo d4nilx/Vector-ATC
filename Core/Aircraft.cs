@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using VectorATC.Core;
 
 public class Aircraft
@@ -68,5 +69,15 @@ public class Aircraft
         double radians = Heading * Math.PI / 180;
         X += (float)Math.Sin(radians) * Speed * deltaTime;
         Y += (float)Math.Cos(radians) * Speed * deltaTime;
+    }
+    
+    public List<(float X, float Y)> TrailPositions { get; } = new List<(float, float)>();
+    private const int MaxTrailLength = 6;
+
+    public void RecordTrailPosition()
+    {
+        TrailPositions.Add((X, Y));
+        if (TrailPositions.Count > MaxTrailLength)
+            TrailPositions.RemoveAt(0);
     }
 }

@@ -24,10 +24,13 @@ namespace VectorATC.UI
 
             radarPanel.OnTrafficUpdated += sidePanel.UpdateList;
 
+            sidePanel.OnAircraftSelectedEvent += controlPanel.SetPrefix;
+
+            controlPanel.OnCommandEntered += radarPanel.ProcessCommand;
+
             leftPanel.AddChild(weatherPanel);
             leftPanel.AddChild(radarPanel);
             leftPanel.AddChild(controlPanel);
-
             mainLayout.AddChild(sidePanel);
         }
     }
