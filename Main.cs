@@ -5,8 +5,13 @@ namespace VectorATC.UI
 {
     public partial class Main : Control
     {
+        private WeatherEngine _weatherEngine = new WeatherEngine();
+        public WeatherData Weather => _weatherEngine.Current;
+
         public override void _Ready()
         {
+            _weatherEngine.Randomize();
+
             SetAnchorsPreset(LayoutPreset.FullRect);
 
             var mainLayout = new HBoxContainer();
@@ -22,10 +27,11 @@ namespace VectorATC.UI
             var controlPanel = new ControlPanel();
             var sidePanel = new SidePanel();
 
+            weatherPanel.Main = this;
+            radarPanel.Main = this;
+
             radarPanel.OnTrafficUpdated += sidePanel.UpdateList;
-
             sidePanel.OnAircraftSelectedEvent += controlPanel.SetPrefix;
-
             controlPanel.OnCommandEntered += radarPanel.ProcessCommand;
 
             leftPanel.AddChild(weatherPanel);

@@ -7,7 +7,7 @@ public class TrafficSpawner
     private float _width;
     private float _height;
     private float _timeSinceLastSpawn = 0f;
-    private float _spawnInterval = 5f;
+    private float _spawnInterval = 45f;
     private Random _random = new Random();
     private int _callsignCounter = 100;
 
@@ -66,15 +66,22 @@ public class TrafficSpawner
                 break;
         }
 
+        Array categories = Enum.GetValues(typeof(FlightCategory));
+        FlightCategory randomCategory = (FlightCategory)categories.GetValue(_random.Next(categories.Length));
+        
         var aircraft = new Aircraft(
             callsign: $"SQP{_callsignCounter++}",
             type: type,
             x: startX,
             y: startY,
             heading: heading,
-            speed: 20,
+    
+            speed: _random.Next(200, 350), 
+    
             altitude: 5000 + _random.Next(0, 30) * 100
         );
+        
+        aircraft.Category = randomCategory;
 
         var (exitX, exitY) = GetOppositePoint(edge);
         var plan = new FlightPlan("ENTRY", "EXIT");
